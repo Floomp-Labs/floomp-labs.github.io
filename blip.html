@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BLIP - A Moment in Time</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+        }
+
+        h1 {
+            font-size: 72px;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 10px #0f6;
+            position: relative;
+            animation: titleGlitch 3s infinite;
+            font-family: monospace;
+            letter-spacing: 8px;
+        }
+
+        h1::before {
+            content: 'BLIP';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: glitch-title 4s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            text-shadow: 2px 0 #0f6;
+            opacity: 0.7;
+        }
+
+        h1::after {
+            content: 'BLIP';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: glitch-title 2s infinite;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            text-shadow: -2px 0 #0f6;
+            opacity: 0.5;
+        }
+
+        @keyframes titleGlitch {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(2deg); }
+            40% { transform: skew(-2deg); }
+            60% { transform: skew(1deg); }
+            80% { transform: skew(-1deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        @keyframes glitch-title {
+            0% { 
+                left: -2px; 
+                top: -2px; 
+                filter: hue-rotate(0deg);
+            }
+            20% { 
+                left: 2px; 
+                top: 1px;
+                filter: hue-rotate(45deg);
+            }
+            40% { 
+                left: -2px; 
+                top: 2px;
+                filter: hue-rotate(90deg);
+            }
+            60% { 
+                left: 2px; 
+                top: -1px;
+                filter: hue-rotate(135deg);
+            }
+            80% { 
+                left: -2px; 
+                top: -2px;
+                filter: hue-rotate(180deg);
+            }
+            100% { 
+                left: 2px; 
+                top: 1px;
+                filter: hue-rotate(0deg);
+            }
+        }
+
+        .description-container {
+            height: 40px;
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .description {
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            line-height: 1.6;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 2px #0f6;
+            min-height: 40px;
+            position: relative;
+        }
+
+        .description::after {
+            content: '|';
+            position: absolute;
+            right: -10px;
+            animation: blink 0.75s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="binary-rain"></canvas>
+    <div class="content">
+        <h1>BLIP</h1>
+        <div class="description-container">
+            <div id="dynamic-description" class="description"></div>
+        </div>
+    </div>
+
+    <script>
+        // Binary Rain Setup
+        const canvas = document.getElementById('binary-rain');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Symbol rain characters
+        const chars = '∞⏱️⌚⊚⊛⊜∰∯∭⋈⋇⋆○◊⟟⟡⟢⟣⟤⟥⨀⨁';
+        const fontSize = 20;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        let symbolOpacity = 0.8;
+
+        // Initialize drops with varied speeds
+        for(let i = 0; i < columns; i++) {
+            drops[i] = {
+                y: Math.floor(Math.random() * -100),
+                speed: 0.5 + Math.random() * 1.5
+            };
+        }
+
+        function drawSymbolRain() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const gradient = ctx.createLinearGradient(
+                    i * fontSize, 
+                    drops[i].y * fontSize - fontSize, 
+                    i * fontSize, 
+                    drops[i].y * fontSize
+                );
+                gradient.addColorStop(0, 'rgba(0, 255, 102, 0)');
+                gradient.addColorStop(0.5, `rgba(0, 255, 102, ${symbolOpacity})`);
+                gradient.addColorStop(1, 'rgba(0, 255, 102, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillText(char, i * fontSize, drops[i].y * fontSize);
+
+                if(drops[i].y * fontSize > canvas.height && Math.random() > 0.95) {
+                    drops[i].y = 0;
+                }
+                drops[i].y += drops[i].speed;
+            }
+        }
+
+        let symbolRainInterval = setInterval(drawSymbolRain, 50);
+
+        // Three.js Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: true 
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        document.body.appendChild(renderer.domElement);
+        
+        // Set initial camera position
+        camera.position.z = 30;
+
+        // Create main portal
+        const portalGeometry = new THREE.TorusKnotGeometry(8, 3, 100, 16);
+        const portalMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00ff66,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.8
+        });
+        const portal = new THREE.Mesh(portalGeometry, portalMaterial);
+        scene.add(portal);
+
+        // Create secondary shape
+        const secondaryGeometry = new THREE.IcosahedronGeometry(4, 1);
+        const secondaryMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00ff66,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6
+        });
+        const secondaryShape = new THREE.Mesh(secondaryGeometry, secondaryMaterial);
+        scene.add(secondaryShape);
+
+        // Create tertiary shape
+        const tertiaryGeometry = new THREE.OctahedronGeometry(3, 1);
+        const tertiaryMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00ff66,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4
+        });
+        const tertiaryShape = new THREE.Mesh(tertiaryGeometry, tertiaryMaterial);
+        scene.add(tertiaryShape);
+
+        // Add lights
+        const light = new THREE.PointLight(0x00ff66, 1, 100);
+        light.position.set(0, 0, 20);
+        scene.add(light);
+
+        const ambientLight = new THREE.AmbientLight(0x00ff66, 0.2);
+        scene.add(ambientLight);
+
+        // Mouse tracking variables
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let time = 0;
+        let mouseSpeed = { x: 0, y: 0 };
+        let lastMousePos = { x: 0, y: 0 };
+
+        // Mouse/Touch event handlers
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            mouseSpeed.x = event.clientX - lastMousePos.x;
+            mouseSpeed.y = event.clientY - lastMousePos.y;
+            lastMousePos.x = event.clientX;
+            lastMousePos.y = event.clientY;
+        });
+
+        document.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            const touch = event.touches[0];
+            mouseX = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(touch.clientY / window.innerHeight) * 2 + 1;
+            
+            mouseSpeed.x = touch.clientX - lastMousePos.x;
+            mouseSpeed.y = touch.clientY - lastMousePos.y;
+            lastMousePos.x = touch.clientX;
+            lastMousePos.y = touch.clientY;
+        }, { passive: false });
+
+        // Animation function
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            const momentum = 0.15;
+            const speedInfluence = 0.002;
+            
+            targetX += (mouseX - targetX) * momentum;
+            targetY += (mouseY - targetY) * momentum;
+
+            const rotationSpeed = {
+                x: mouseSpeed.x * speedInfluence,
+                y: mouseSpeed.y * speedInfluence
+            };
+
+            // Portal animation
+            portal.rotation.x += 0.005 + targetY * 0.03 + rotationSpeed.y;
+            portal.rotation.y += 0.007 + targetX * 0.03 + rotationSpeed.x;
+            portal.rotation.z += 0.003 + (Math.abs(targetX) + Math.abs(targetY)) * 0.01;
+            portal.scale.x = 1 + Math.sin(time * 0.5) * 0.3 + Math.abs(targetX) * 0.3;
+            portal.scale.y = 1 + Math.cos(time * 0.5) * 0.3 + Math.abs(targetY) * 0.3;
+            portal.position.x = Math.sin(time) * 5 + targetX * 10;
+            portal.position.y = Math.cos(time * 1.3) * 5 + targetY * 10;
+
+            // Secondary shape animation
+            secondaryShape.rotation.x -= 0.006 - targetY * 0.05 + rotationSpeed.y;
+            secondaryShape.rotation.y -= 0.004 - targetX * 0.05 + rotationSpeed.x;
+            secondaryShape.rotation.z += (targetX - targetY) * 0.03;
+            secondaryShape.position.x = Math.sin(time * 1.5) * 8 + targetX * 12;
+            secondaryShape.position.y = Math.cos(time * 1.7) * 8 + targetY * 12;
+            secondaryShape.scale.x = 1 + Math.cos(time * 0.3) * 0.4 + Math.abs(targetX) * 0.4;
+            secondaryShape.scale.y = 1 + Math.sin(time * 0.3) * 0.4 + Math.abs(targetY) * 0.4;
+
+            // Tertiary shape animation
+            tertiaryShape.rotation.x += 0.004 + targetY * 0.04 + rotationSpeed.y;
+            tertiaryShape.rotation.y += (targetX - targetY) * 0.03 + rotationSpeed.x;
+            tertiaryShape.rotation.z += 0.002 + targetX * 0.04;
+            tertiaryShape.position.x = Math.sin(time * 2) * 10 + targetX * 15;
+            tertiaryShape.position.y = Math.cos(time * 2.2) * 10 + targetY * 15;
+            tertiaryShape.scale.x = 1 + Math.sin(time * 0.4) * 0.3 + Math.abs(targetY) * 0.3;
+            tertiaryShape.scale.y = 1 + Math.cos(time * 0.4) * 0.3 + Math.abs(targetX) * 0.3;
+
+            camera.position.x = targetX * 3;
+            camera.position.y = targetY * 3;
+            camera.position.z = 30 + (Math.abs(targetX) + Math.abs(targetY)) * 5;
+            camera.lookAt(scene.position);
+
+            mouseSpeed.x *= 0.95;
+            mouseSpeed.y *= 0.95;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start animation
+        animate();
+
+        // Typewriter effect
+        const descriptions = [
+            "In the vast expanse of time, a single moment can change everything.",
+            "BLIP isn't just another cryptocurrency - it's a temporal revolution.",
+            "A digital timestamp of now, forever preserved in the blockchain.",
+            "Each transaction captures a unique moment.",
+            "A blip in time that will echo through the digital ages."
+        ];
+
+        let currentLine = 0;
+        let currentChar = 0;
+        let isDeleting = false;
+        let isWaiting = false;
+        const descriptionElement = document.getElementById('dynamic-description');
+
+        function typeWriter() {
+            const currentText = descriptions[currentLine];
+            
+            if (!isWaiting) {
+                if (!isDeleting) {
+                    descriptionElement.textContent = currentText.substring(0, currentChar + 1);
+                    currentChar++;
+
+                    if (currentChar === currentText.length) {
+                        isWaiting = true;
+                        setTimeout(() => {
+                            isDeleting = true;
+                            isWaiting = false;
+                        }, 1500);
+                    }
+                } else {
+                    descriptionElement.textContent = currentText.substring(0, currentChar - 1);
+                    currentChar--;
+
+                    if (currentChar === 0) {
+                        isDeleting = false;
+                        currentLine = (currentLine + 1) % descriptions.length;
+                    }
+                }
+            }
+
+            let typeSpeed = isDeleting ? 30 : 50;
+            typeSpeed += Math.random() * 20;
+
+            setTimeout(typeWriter, typeSpeed);
+        }
+
+        // Start typewriter
+        typeWriter();
+    </script>
+</body>
+</html>
