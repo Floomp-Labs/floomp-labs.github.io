@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floomp Labs - ASCII Art</title>
+    <style>
+        body {
+            background-color: #0a1622;
+            color: #00ff88;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: monospace;
+            overflow: hidden;
+        }
+        
+        .ascii-container {
+            font-size: 10px;
+            line-height: 10px;
+            white-space: pre;
+            text-align: center;
+            animation: glow 3s infinite alternate;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00ff88;
+            }
+            to {
+                text-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88;
+            }
+        }
+        
+        .portal {
+            color: #00ff88;
+        }
+        
+        .wall {
+            color: #1a3f5c;
+        }
+        
+        .vial-blue {
+            color: #00aaff;
+        }
+        
+        .vial-dark {
+            color: #003366;
+        }
+        
+        h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px #00ff88;
+            animation: glow 2s infinite alternate;
+        }
+    </style>
+</head>
+<body>
+    <div class="ascii-container">
+<pre class="wall">
+                                    .--.       .--.                             
+                            _/~~~~"-._  _/~~~~"-._                        
+                          ,"~~~~~~~~~.`'~~~~~~~~~~.`.                     
+                         /~~~~~~~~~~~~~~~~~~~~~~~~~~~\                    
+                        /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\.                
+                       /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\_            
+                      (~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~)          
+                      \~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/            
+                     <span class="portal">          \~~~~~~~~~~~~~~~~~~~~~~~~~/          </span>         
+                     <span class="portal">          \~~~~~~~~~~~~~~~~~~~/          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">              FLOOMP LABS                 </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">                                          </span>        
+                     <span class="portal">          /~~~~~~~~~~~~~~~~~~~\          </span>        
+                     <span class="portal">          /~~~~~~~~~~~~~~~~~~~~~~~~~\          </span>         
+                      /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\            
+                     (~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~)          
+                      \~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/            
+                       \~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/                
+                        \~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/                 
+                         `.~~~~~~~~~~,-'-.~~~~~~~~~~,'                  
+                          "._~~~~~,' <span class="vial-dark">\_| |_/</span>  `.~~~,'"             
+                             ""--'  <span class="vial-dark">|</span><span class="vial-blue">===</span><span class="vial-dark">|</span>    `--""                      
+                                    <span class="vial-dark">\_|_/</span>                               
+                                     <span class="vial-blue">===</span>                                
+                                    <span class="vial-blue">/   \</span>                              
+                                   <span class="vial-blue">|     |</span>                             
+                                   <span class="vial-blue">|     |</span>                             
+                                   <span class="vial-blue">|_____|</span>                
+</pre>
+    </div>
+
+    <script>
+        // Optional: Add some particle effects for bubbles
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('body');
+            
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.textContent = '.';
+                bubble.style.position = 'absolute';
+                bubble.style.color = '#00ffaa';
+                bubble.style.opacity = Math.random() * 0.5 + 0.1;
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.top = Math.random() * 100 + '%';
+                bubble.style.fontSize = Math.random() * 20 + 10 + 'px';
+                bubble.style.animation = `float ${Math.random() * 10 + 5}s ease-in-out infinite`;
+                
+                const floatKeyframes = `
+                    @keyframes float {
+                        0% {
+                            transform: translate(0, 0);
+                        }
+                        50% {
+                            transform: translate(${Math.random() * 20 - 10}px, -${Math.random() * 50 + 20}px);
+                        }
+                        100% {
+                            transform: translate(0, 0);
+                        }
+                    }
+                `;
+                
+                const style = document.createElement('style');
+                style.textContent = floatKeyframes;
+                document.head.appendChild(style);
+                
+                container.appendChild(bubble);
+            }
+        });
+    </script>
+</body>
+</html>
